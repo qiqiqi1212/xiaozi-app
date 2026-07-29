@@ -66,6 +66,7 @@
       case 'other': renderOther(); break;
     }
   }
+  window.render = render;
   async function loadWeatherOnly() {
     currentTab = 'life';
     await renderLife();
