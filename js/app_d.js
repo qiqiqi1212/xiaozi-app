@@ -118,6 +118,7 @@
   /* ================= 设置 / 备份 ================= */
   function openSettings() {
     const p = DB.state.profile;
+    const c = DB.getSyncCfg();
     const html = `<div class="modal-mask" data-act="close-modal"></div>
       <div class="modal"><div class="modal-head"><h3>⚙️ 设置与备份</h3><button class="modal-close" data-act="close-modal">✕</button></div>
       <div class="field"><label>我的称呼</label><input id="p-name" value="${esc(p.name)}"></div>
@@ -134,6 +135,16 @@
         <button class="btn danger sm" id="reset-btn">清空数据</button>
         <input type="file" id="imp-file" accept="application/json" style="display:none">
       </div>
+      <div class="hr"></div>
+      <div class="card-title"><span class="emoji">☁️</span>云同步（手机↔iPad 自动同步）</div>
+      <div class="muted" style="margin-bottom:8px">用你的 GitHub 私密 Gist 存数据，两台设备填同一个 Token 即可自动对齐。Token 只存在本机，不上传给别人。</div>
+      <div class="field"><label>GitHub Token</label><input id="sync-token" type="password" placeholder="ghp_..." value="${esc(c.token || '')}"></div>
+      <label class="row" style="display:flex;align-items:center;gap:8px;margin:6px 0"><input type="checkbox" id="sync-auto" ${c.auto ? 'checked' : ''}> 开启自动同步（后台每30秒对齐 + 改动即上传）</label>
+      <div class="btn-row">
+        <button class="btn sm" id="sync-save">保存同步设置</button>
+        <button class="btn soft sm" id="sync-now">立即同步</button>
+      </div>
+      <div class="muted" id="sync-status" style="margin-top:6px">${esc(c.token ? (c.auto ? '自动同步已开启' : '已配置，未开启自动同步') : '未配置云同步')}</div>
       </div>`;
     modalRoot.innerHTML = html; modalRoot.classList.add('show');
     $('#save-profile').onclick = () => {
@@ -157,6 +168,21 @@
     };
     $('#reset-btn').onclick = () => {
       if (confirm('确定清空全部数据？此操作不可撤销，建议先导出备份。')) { DB.reset(); closeModal(); render(); toast('已清空'); }
+    };
+    $('#sync-save').onclick = async () => {
+      const token = $('#sync-token').value.trim();
+      if (!token) { toast('请先填写 Token'); return; }
+      const c2 = DB.getSyncCfg();
+      c2.token = token; c2.auto = $('#sync-auto').checked; DB.setSyncCfg(c2);
+      Sync.status('☁️ 正在连接…');
+      try { await Sync.ensureGist(token); toast('云同步已就绪'); Sync.init(); }
+      catch (e) { toast('连接失败：' + e.message); }
+    };
+    $('#sync-now').onclick = async () => {
+      const c2 = DB.getSyncCfg();
+      if (!c2.token) { toast('请先填写 Token 并保存'); return; }
+      Sync.status('☁️ 同步中…');
+      try { await Sync.push(); await Sync.pull(); } catch (e) {}
     };
   }
   $('#btn-backup').addEventListener('click', openSettings);
@@ -186,6 +212,7 @@
   function start() {
     if ('serviceWorker' in navigator) { window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {})); }
     setTabUI(); render(); checkReminders();
+    if (window.Sync) Sync.init();
   }
   start();
 })();
