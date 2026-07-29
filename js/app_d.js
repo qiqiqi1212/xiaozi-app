@@ -143,8 +143,10 @@
       <div class="btn-row">
         <button class="btn sm" id="sync-save">保存同步设置</button>
         <button class="btn soft sm" id="sync-now">立即同步</button>
+        <button class="btn soft sm" id="sync-repair">重新配对</button>
       </div>
       <div class="muted" id="sync-status" style="margin-top:6px">${esc(c.token ? (c.auto ? '自动同步已开启' : '已配置，未开启自动同步') : '未配置云同步')}</div>
+      <div class="muted" style="margin-top:4px;font-size:11px;word-break:break-all">${esc(global.Sync && Sync.diagnose ? Sync.diagnose() : '')}</div>
       </div>`;
     modalRoot.innerHTML = html; modalRoot.classList.add('show');
     $('#save-profile').onclick = () => {
@@ -183,6 +185,10 @@
       if (!c2.token) { toast('请先填写 Token 并保存'); return; }
       Sync.status('☁️ 同步中…');
       try { await Sync.push(); await Sync.pull(); } catch (e) {}
+    };
+    $('#sync-repair').onclick = async () => {
+      Sync.status('☁️ 重新配对中…');
+      try { await Sync.repair(); } catch (e) {}
     };
   }
   $('#btn-backup').addEventListener('click', openSettings);
