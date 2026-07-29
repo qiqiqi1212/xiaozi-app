@@ -1,0 +1,36 @@
+{
+  "name": "小紫同学 · 工作学习生活助手",
+  "short_name": "小紫同学",
+  "description": "历史学考研党的工作/学习/生活/备忘一站式清新紫色助手",
+  "start_url": "index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f6f3ff",
+  "theme_color": "#8b5cf6",
+  "icons": [
+    {
+      "src": "assets/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "apple touch icon"
+    }
+  ]
+}
