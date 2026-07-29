@@ -1,11 +1,12 @@
 // 小紫同学 PWA Service Worker —— 离线缓存
-const CACHE = 'xiaozi-v5';
+const CACHE = 'xiaozi-v6';
 const ASSETS = [
   'index.html',
   'manifest.webmanifest',
   'css/style.css',
   'js/content.js',
   'js/db.js',
+  'js/sync.js',
   'js/app_a.js', 'js/app_b.js', 'js/app_c.js', 'js/app_d.js',
   'assets/icon.svg',
   'assets/icon-192.png',
