@@ -1,7 +1,6 @@
 /* 小紫同学 · 主程序 */
-(function () {
-  'use strict';
-  const $ = (s, r) => (r || document).querySelector(s);
+'use strict';
+const $ = (s, r) => (r || document).querySelector(s);
   const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const z = (n) => String(n).padStart(2, '0');
