@@ -1,5 +1,5 @@
 // 小紫同学 PWA Service Worker —— 离线缓存
-const CACHE = 'xiaozi-v8';
+const CACHE = 'xiaozi-v9';
 const ASSETS = [
   'index.html',
   'manifest.webmanifest',
