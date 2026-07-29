@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#8b5cf6" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="小紫同学" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="assets/icon-512.png" />
+  <link rel="icon" type="image/svg+xml" href="assets/icon.svg" />
+  <title>小紫同学 · 工作学习生活助手</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <!-- 临期提醒横幅 -->
+  <div id="reminder-banner" class="reminder-banner hidden"></div>
+
+  <!-- 顶部 -->
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="brand">
+        <img src="assets/icon.svg" class="brand-logo" alt="logo" />
+        <div>
+          <div class="brand-title">小紫同学</div>
+          <div class="brand-sub" id="header-date">今天也要加油呀 ✨</div>
+        </div>
+      </div>
+      <button class="icon-btn" id="btn-backup" title="备份与恢复">⚙️</button>
+    </div>
+  </header>
+
+  <!-- 主内容 -->
+  <main id="view" class="view"></main>
+
+  <!-- 底部 Tab -->
+  <nav class="tabbar">
+    <button class="tab active" data-tab="home"><span class="tab-ico">🏠</span><span>首页</span></button>
+    <button class="tab" data-tab="work"><span class="tab-ico">📚</span><span>工作</span></button>
+    <button class="tab" data-tab="study"><span class="tab-ico">🎓</span><span>学习</span></button>
+    <button class="tab" data-tab="life"><span class="tab-ico">🌿</span><span>生活</span></button>
+    <button class="tab" data-tab="other"><span class="tab-ico">📝</span><span>其他</span></button>
+  </nav>
+
+  <!-- 通用弹窗 -->
+  <div id="modal-root"></div>
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="js/content.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
