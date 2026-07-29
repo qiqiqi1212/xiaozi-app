@@ -6,7 +6,7 @@ const ASSETS = [
   'css/style.css',
   'js/content.js',
   'js/db.js',
-  'js/app.js',
+  'js/app_a.js', 'js/app_b.js', 'js/app_c.js', 'js/app_d.js',
   'assets/icon.svg',
   'assets/icon-192.png',
   'assets/icon-512.png'
