@@ -96,10 +96,28 @@
     const c = cfg();
     if (!c.token) { status('未配置云同步'); return; }
     status('☁️ 同步中…');
+    if (!c.gistId) {
+      try { await ensureGist(c.token); }
+      catch (e) { status('⚠️ 无法连接同步：' + e.message); return; }
+    }
     try { await pull(); } catch (e) {}
     if (c.auto) { startPolling(); DB.onLocalChange(schedulePush); status('☁️ 自动同步已开启'); }
     else { stopPolling(); status('已配置，未开启自动同步'); }
   }
 
-  global.Sync = { init, push, pull, ensureGist, status, startPolling, stopPolling };
+  function diagnose() {
+    const c = cfg();
+    return '仓库ID: ' + (c.gistId ? c.gistId.slice(0, 12) : '（空）') + ' ｜ 本机ID: ' + DEV + ' ｜ Token: ' + (c.token ? '已填' : '未填');
+  }
+
+  async function repair() {
+    const c = cfg();
+    if (!c.token) { status('请先填 Token 并保存'); return; }
+    c.gistId = null; DB.setSyncCfg(c);
+    status('☁️ 正在重新配对…');
+    try { await ensureGist(c.token); await pull(); if (global.render) global.render(); status('☁️ 重新配对完成 ' + clock()); }
+    catch (e) { status('⚠️ 配对失败：' + e.message); }
+  }
+
+  global.Sync = { init, push, pull, ensureGist, status, startPolling, stopPolling, diagnose, repair };
 })(window);
