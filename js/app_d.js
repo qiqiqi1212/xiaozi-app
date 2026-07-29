@@ -215,4 +215,4 @@
     if (window.Sync) Sync.init();
   }
   start();
-})();
+
