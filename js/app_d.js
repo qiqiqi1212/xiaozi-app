@@ -145,8 +145,13 @@
         <button class="btn soft sm" id="sync-now">立即同步</button>
         <button class="btn soft sm" id="sync-repair">重新配对</button>
       </div>
+      <div class="btn-row" style="margin-top:4px">
+        <button class="btn soft sm" id="sync-push">强制推送到云端</button>
+        <button class="btn soft sm" id="sync-pull">强制从云端拉取</button>
+      </div>
       <div class="muted" id="sync-status" style="margin-top:6px">${esc(c.token ? (c.auto ? '自动同步已开启' : '已配置，未开启自动同步') : '未配置云同步')}</div>
-      <div class="muted" style="margin-top:4px;font-size:11px;word-break:break-all">${esc(global.Sync && Sync.diagnose ? Sync.diagnose() : '')}</div>
+      <div class="muted" id="sync-diag" style="margin-top:4px;font-size:11px;word-break:break-all">${esc(typeof Sync !== 'undefined' && Sync.diagnose ? Sync.diagnose() : '')}</div>
+      <div class="muted" id="sync-cloud" style="margin-top:4px;font-size:11px;word-break:break-all">云端摘要：点击“立即同步”后显示</div>
       </div>`;
     modalRoot.innerHTML = html; modalRoot.classList.add('show');
     $('#save-profile').onclick = () => {
@@ -177,19 +182,48 @@
       const c2 = DB.getSyncCfg();
       c2.token = token; c2.auto = $('#sync-auto').checked; DB.setSyncCfg(c2);
       Sync.status('☁️ 正在连接…');
-      try { await Sync.ensureGist(token); toast('云同步已就绪'); Sync.init(); }
+      try {
+        await Sync.ensureGist(token);
+        await Sync.init();
+        toast('云同步已就绪');
+        await refreshCloudSummary(); updateDiag();
+      }
       catch (e) { toast('连接失败：' + e.message); }
     };
     $('#sync-now').onclick = async () => {
       const c2 = DB.getSyncCfg();
       if (!c2.token) { toast('请先填写 Token 并保存'); return; }
       Sync.status('☁️ 同步中…');
-      try { await Sync.push(); await Sync.pull(); } catch (e) {}
+      try { await Sync.push(); await Sync.pull(); await refreshCloudSummary(); } catch (e) {}
     };
     $('#sync-repair').onclick = async () => {
       Sync.status('☁️ 重新配对中…');
-      try { await Sync.repair(); } catch (e) {}
+      try { await Sync.repair(); await refreshCloudSummary(); updateDiag(); } catch (e) {}
     };
+    $('#sync-push').onclick = async () => {
+      const c2 = DB.getSyncCfg();
+      if (!c2.token) { toast('请先填写 Token 并保存'); return; }
+      try { await Sync.forcePush(); await refreshCloudSummary(); updateDiag(); } catch (e) {}
+    };
+    $('#sync-pull').onclick = async () => {
+      const c2 = DB.getSyncCfg();
+      if (!c2.token) { toast('请先填写 Token 并保存'); return; }
+      try { await Sync.forcePull(); await refreshCloudSummary(); updateDiag(); } catch (e) {}
+    };
+
+    async function refreshCloudSummary() {
+      const s = await Sync.cloudSummary();
+      const el = $('#sync-cloud');
+      if (!el) return;
+      if (s.error) { el.textContent = '云端摘要：' + s.error; return; }
+      const t = s.updatedAt ? new Date(s.updatedAt).toLocaleString('zh-CN', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '未知';
+      el.textContent = '云端摘要：任务' + s.tasks + ' 条｜记账' + s.expenses + ' 条｜便签' + s.notes + ' 条｜备忘' + s.memos + ' 条｜最后更新 ' + t + '（来自 ' + (s.dev || '未知') + '）';
+    }
+    function updateDiag() {
+      const el = $('#sync-diag');
+      if (el && typeof Sync !== 'undefined' && Sync.diagnose) el.textContent = Sync.diagnose();
+    }
+    refreshCloudSummary(); updateDiag();
   }
   $('#btn-backup').addEventListener('click', openSettings);
 
