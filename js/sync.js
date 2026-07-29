@@ -18,17 +18,34 @@
 
   let pushing = false, pushTimer = null, pollTimer = null, suppress = false;
 
+  async function findExistingGist(token) {
+    try {
+      const res = await fetch(API + '/gists?per_page=100', { headers: hdr(token) });
+      if (!res.ok) return null;
+      const list = await res.json();
+      for (const g of list) {
+        if (g.files && g.files[FILE]) return g.id;
+        if (g.description === 'xiaozi-sync') return g.id;
+      }
+    } catch (e) {}
+    return null;
+  }
+
   async function ensureGist(token) {
     const c = cfg();
     if (c.gistId) return c.gistId;
-    const res = await fetch(API + '/gists', {
-      method: 'POST', headers: hdr(token),
-      body: JSON.stringify({ description: 'xiaozi-sync', public: false, files: { [FILE]: { content: payload() } } })
-    });
-    if (!res.ok) throw new Error('创建失败 ' + res.status);
-    const j = await res.json();
-    c.gistId = j.id; saveCfg(c);
-    return j.id;
+    let id = await findExistingGist(token);
+    if (!id) {
+      const res = await fetch(API + '/gists', {
+        method: 'POST', headers: hdr(token),
+        body: JSON.stringify({ description: 'xiaozi-sync', public: false, files: { [FILE]: { content: payload() } } })
+      });
+      if (!res.ok) throw new Error('创建失败 ' + res.status);
+      const j = await res.json();
+      id = j.id;
+    }
+    c.gistId = id; saveCfg(c);
+    return id;
   }
 
   async function push() {
