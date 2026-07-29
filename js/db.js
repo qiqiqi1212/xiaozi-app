@@ -47,6 +47,9 @@
     }
   }
 
+  const changeHooks = [];
+  function onLocalChange(fn) { if (typeof fn === 'function') changeHooks.push(fn); }
+
   function save() {
     try {
       localStorage.setItem(KEY, JSON.stringify(state));
@@ -54,7 +57,12 @@
       console.error('保存失败', e);
       alert('保存失败：存储空间可能已满。');
     }
+    for (let i = 0; i < changeHooks.length; i++) { try { changeHooks[i](); } catch (e) {} }
   }
+
+  const SYNC_KEY = 'xiaozi_sync_cfg';
+  function getSyncCfg() { try { return JSON.parse(localStorage.getItem(SYNC_KEY)) || {}; } catch (e) { return {}; } }
+  function setSyncCfg(c) { localStorage.setItem(SYNC_KEY, JSON.stringify(c || {})); }
 
   function reset() {
     state = defaultState();
@@ -88,6 +96,7 @@
     },
     remove(collection, id) {
       state[collection] = state[collection].filter((x) => x.id !== id); save();
-    }
+    },
+    onLocalChange, getSyncCfg, setSyncCfg
   };
 })(window);
